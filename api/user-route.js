@@ -16,7 +16,7 @@ userRoute.post("/auth/register", async (req,res)=>{
 		let userExists = await UserSchemaE.find({phoneNumber : newUser.phoneNumber})
 	 
 		if (userExists.length > 0) {
-			return res.status(200).json( {message: "already exists", user : [] } )
+			return res.status(401).json( {message: "User already exists", user : [] } )
 		}
 			const user = await newUser.save()
 			console.log(user._id)
@@ -44,11 +44,11 @@ userRoute.post("/auth/login", async (req,res)=>{
 		   
 		}
 		 
-		else if (user._doc && user.password === req.body.password ) {
+		else if (user._doc && user.password === req.body.password.trim() ) {
 			const  {password , ...sendDetails} = user
 			return user && res.status(200).json({ message : "user logged in", user : sendDetails._doc }) 
 		} else {
-		 return res.status(400).json( {message : "Invalid password " , user : []  }) 
+		 return res.status(401).json( {message : "Invalid password " , user : []  }) 
 		}
 	} catch (error) {
 		const user = await UserSchemaE.findOne({email : req.body.email})
